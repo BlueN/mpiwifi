@@ -13,5 +13,6 @@
     <string name="err_otherNet">Unknown network. Please confirm it is the WiFi of MPI NamOn hostel.</string>
     <string name="err_loginFail">Login fail. Please check your Net ID and password.</string>
     <string name="login_ok">Login successful. Your IP is %s .</string>
+    <string name="menu_exit">Exit</string>
     
 </resources>

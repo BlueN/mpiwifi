@@ -9,5 +9,6 @@
     <string name="login_login">登录</string>
     <string name="login_ok">登录成功！您的 IP 为 %s。</string>
     <string name="login_pwd">密码: </string>
+    <string name="menu_exit">关闭</string>
 
 </resources>
