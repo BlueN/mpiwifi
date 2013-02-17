@@ -10,6 +10,7 @@
     tools:context=".MainActivity" >
 
     <TableLayout
+        android:id="@+id/tableLayout1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -34,7 +35,6 @@
                 android:ems="10"
                 android:hint="p1234567"
                 android:inputType="text" />
-
         </TableRow>
 
         <TableRow
@@ -57,7 +57,6 @@
 
                 <requestFocus />
             </EditText>
-
         </TableRow>
 
         <TableRow
@@ -75,5 +74,14 @@
 
         </TableRow>
     </TableLayout>
+
+    <CheckBox
+        android:id="@+id/autoLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tableLayout1"
+        android:layout_centerHorizontal="true"
+        android:onClick="setAutoLogin"
+        android:text="@string/login_autoLogin" />
 
 </RelativeLayout>

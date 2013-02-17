@@ -14,5 +14,6 @@
     <string name="err_loginFail">Login fail. Please check your Net ID and password.</string>
     <string name="login_ok">Login successful. Your IP is %s .</string>
     <string name="menu_exit">Exit</string>
+    <string name="login_autoLogin">Auto login after connected.</string>
     
 </resources>
