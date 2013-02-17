@@ -1,0 +1,13 @@
+<resources>
+
+    <string name="err_already">您已连接互联网，无需登录。</string>
+    <string name="err_loginFail">登录失败，请检查 Net ID 及密码。</string>
+    <string name="err_noEnter">请先输入您的 Net ID 及密码。</string>
+    <string name="err_noNet">无网络</string>
+    <string name="err_otherNet">未知网络，请确认您连接的是南岸宿舍 Wi-Fi。</string>
+    <string name="err_unknow">抱歉，发生未知错误。</string>
+    <string name="login_login">登录</string>
+    <string name="login_ok">登录成功！您的 IP 为 %s。</string>
+    <string name="login_pwd">密码: </string>
+
+</resources>
