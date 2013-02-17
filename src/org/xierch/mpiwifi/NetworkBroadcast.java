@@ -39,7 +39,9 @@ public class NetworkBroadcast extends BroadcastReceiver {
     	WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
     	if (!wifiManager.isWifiEnabled()) return;
     	WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-    	if (wifiInfo != null)
+    	if (wifiInfo == null) return;
+    	String ssid = wifiInfo.getSSID();
+    	if (ssid != null)
 	    	if (wifiInfo.getSSID().equals("NamOn_Hostel"))
 	    		WifiLoginer.loginNamon(context, netId, pwd, true);
     	
