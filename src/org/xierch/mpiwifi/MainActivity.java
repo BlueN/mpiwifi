@@ -76,7 +76,6 @@ public class MainActivity extends Activity {
 
     
     public void login(View v) {
-    	Button   btn    = (Button)   findViewById(R.id.login);
     	EditText netIdR = (EditText) findViewById(R.id.netId);
     	EditText pwdR   = (EditText) findViewById(R.id.pwd);
     	CheckBox autoR  = (CheckBox) findViewById(R.id.autoLogin);
