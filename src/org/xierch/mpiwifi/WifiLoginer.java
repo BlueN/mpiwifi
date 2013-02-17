@@ -17,8 +17,12 @@ import android.content.Context;
 import android.widget.Toast;
 
 public class WifiLoginer {
-	public static void loginNamon(Context context, String netId, String pwd) {
-    	HttpURLConnection urlConn = null;
+	public static void loginNamon(Context context, String netId, String pwd, Boolean lessToast) {
+    	/* If lessToast is true, only show those message: 
+    	 * 		login success, password incorrect and unknown error.
+    	 * Use for auto login.
+    	 */
+		HttpURLConnection urlConn = null;
     	String resp;
     	
     	// Get the URL of login page: 
@@ -32,13 +36,16 @@ public class WifiLoginer {
 			resp = new String(data, 0, length);
 			
 		} catch (FileNotFoundException e) {
-			Toast.makeText(context, R.string.err_already, Toast.LENGTH_SHORT).show();
+			if (!lessToast)
+				Toast.makeText(context, R.string.err_already, Toast.LENGTH_SHORT).show();
 			return;
 		} catch (ConnectException e) {
-			Toast.makeText(context, R.string.err_noNet, Toast.LENGTH_SHORT).show();
+			if (!lessToast)
+				Toast.makeText(context, R.string.err_noNet, Toast.LENGTH_SHORT).show();
 			return;
 		} catch (UnknownHostException e) {
-			Toast.makeText(context, R.string.err_noNet, Toast.LENGTH_SHORT).show();
+			if (!lessToast)
+				Toast.makeText(context, R.string.err_noNet, Toast.LENGTH_SHORT).show();
 			return;
 		} catch (Exception e) {
 			Toast.makeText(context, R.string.err_unknow, Toast.LENGTH_SHORT).show();
@@ -68,7 +75,8 @@ public class WifiLoginer {
 			resp = new String(data, 0, length);
 			
     	} catch (MalformedURLException e) {
-    		Toast.makeText(context, R.string.err_otherNet, Toast.LENGTH_SHORT).show();
+    		if (!lessToast)
+    			Toast.makeText(context, R.string.err_otherNet, Toast.LENGTH_SHORT).show();
     		return;
     	} catch (Exception e) {
     		Toast.makeText(context, R.string.err_unknow, Toast.LENGTH_SHORT).show();

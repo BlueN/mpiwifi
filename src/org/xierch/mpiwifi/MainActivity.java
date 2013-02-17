@@ -98,7 +98,7 @@ public class MainActivity extends Activity {
     	}
     	
     	btn.setEnabled(false);
-    	WifiLoginer.loginNamon(this, netId, pwd);
+    	WifiLoginer.loginNamon(this, netId, pwd, false);
     	
     	btn.setEnabled(true);
     }

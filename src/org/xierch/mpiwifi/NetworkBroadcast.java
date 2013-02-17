@@ -37,10 +37,7 @@ public class NetworkBroadcast extends BroadcastReceiver {
     	WifiInfo wifiInfo = wifiManager.getConnectionInfo();
     	if (wifiInfo != null)
 	    	if (wifiInfo.getSSID().equals("NamOn_Hostel"))
-	    		WifiLoginer.loginNamon(context, netId, pwd);
-    	
-    			
-    	
+	    		WifiLoginer.loginNamon(context, netId, pwd, true);
     	
 	}
 
