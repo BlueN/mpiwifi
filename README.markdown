@@ -18,5 +18,10 @@ The program can make it easier.
 
 ---
 
-###To do###
-* Login automatically without click.
+###How to use###
+1. Download the APK file and install it on your Android phone;
+2. Run *MPI Wi-Fi*, enter your *Net ID* and *Password*;
+3. Check the *Auto login* box;
+4. Close the application.
+
+Then, whenever you connected NamOn_Hostel Wi-Fi, the application will auto login for you.
