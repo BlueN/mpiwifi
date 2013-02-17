@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiInfo;  
 import android.net.wifi.WifiManager;  
+import android.os.StrictMode;
 
 public class NetworkBroadcast extends BroadcastReceiver {
 
@@ -31,6 +32,9 @@ public class NetworkBroadcast extends BroadcastReceiver {
     		editor.commit();
     		return;
     	}
+    	
+    	StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+        	.permitNetwork().build());
     	
     	WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
     	if (!wifiManager.isWifiEnabled()) return;

@@ -19,9 +19,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-	        .detectNetwork()
-	        .penaltyLog()
-	        .build());
+	        .permitNetwork().build());
         
         loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
         settings = getSharedPreferences("settings", MODE_PRIVATE);
