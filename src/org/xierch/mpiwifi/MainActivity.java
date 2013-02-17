@@ -1,6 +1,7 @@
 package org.xierch.mpiwifi;
 
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.view.Menu;
@@ -16,6 +17,11 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+	        .detectNetwork()
+	        .penaltyLog()
+	        .build());
         
         loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
         settings = getSharedPreferences("settings", MODE_PRIVATE);
