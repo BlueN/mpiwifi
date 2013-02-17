@@ -9,8 +9,8 @@
     <string name="err_noEnter">Please enter Net ID and Password.</string>
     <string name="err_noNet">No network connect.</string>
     <string name="err_already">You already can access Internet.</string>
-    <string name="err_unknow">Sorry, an unknow error occurred.</string>
-    <string name="err_otherNet">Unknow network. Please confirm it is the WiFi of MPI NamOn hostel.</string>
+    <string name="err_unknow">Sorry, an unknown error occurred.</string>
+    <string name="err_otherNet">Unknown network. Please confirm it is the WiFi of MPI NamOn hostel.</string>
     <string name="err_loginFail">Login fail. Please check your Net ID and password.</string>
     <string name="login_ok">Login successful. Your IP is %s .</string>
     
