@@ -29,7 +29,7 @@ public class WifiLoginer {
     	try {
 			URL url = new URL("http://www.google.com/noexist");
 			urlConn = (HttpURLConnection) url.openConnection();
-			urlConn.setConnectTimeout(3000);
+			urlConn.setConnectTimeout(2000);
 			InputStream in = new BufferedInputStream(urlConn.getInputStream());
 			byte[] data = new byte[1024];
 			int length = in.read(data);
@@ -69,6 +69,7 @@ public class WifiLoginer {
 	    	
 	    	URL url = new URL(loginUrl);
 	    	urlConn = (HttpURLConnection) url.openConnection();
+	    	urlConn.setConnectTimeout(2000);
 			InputStream in = new BufferedInputStream(urlConn.getInputStream());
 			byte[] data = new byte[10240];
 			int length = in.read(data);
