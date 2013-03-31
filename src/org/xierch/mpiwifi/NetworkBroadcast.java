@@ -8,7 +8,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiInfo;  
 import android.net.wifi.WifiManager;  
-import android.os.StrictMode;
+
 
 public class NetworkBroadcast extends BroadcastReceiver {
 
@@ -33,18 +33,22 @@ public class NetworkBroadcast extends BroadcastReceiver {
     		return;
     	}
     	
-    	StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-        	.permitNetwork().build());
-    	
     	WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
     	if (!wifiManager.isWifiEnabled()) return;
     	WifiInfo wifiInfo = wifiManager.getConnectionInfo();
     	if (wifiInfo == null) return;
     	String ssid = wifiInfo.getSSID();
-    	if (ssid != null)
-	    	if (wifiInfo.getSSID().equals("NamOn_Hostel"))
-	    		WifiLoginer.loginNamon(context, netId, pwd, true);
+    	String target;
+    	if (ssid == null) return;
+    	if (wifiInfo.getSSID().equals("NamOn_Hostel")) target = "Namon";
+    	else return;
     	
+    	Intent login = new Intent(context, WifiLoginer.class);
+    	login.putExtra("target", target);
+    	login.putExtra("username", netId);
+    	login.putExtra("password", pwd);
+    	login.putExtra("lessToast", false);
+    	context.startService(login);
 	}
 
 }

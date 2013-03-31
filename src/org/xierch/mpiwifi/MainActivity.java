@@ -1,8 +1,8 @@
 package org.xierch.mpiwifi;
 
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,9 +17,6 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-	        .permitNetwork().build());
         
         loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
         settings = getSharedPreferences("settings", MODE_PRIVATE);
@@ -94,6 +91,11 @@ public class MainActivity extends Activity {
     		return;
     	}
     	
-    	WifiLoginer.loginNamon(this, netId, pwd, false);
+    	Intent login = new Intent(this, WifiLoginer.class);
+    	login.putExtra("target", "Namon");
+    	login.putExtra("username", netId);
+    	login.putExtra("password", pwd);
+    	login.putExtra("lessToast", false);
+    	startService(login);
     }
 }

@@ -13,11 +13,44 @@ import java.net.UnknownHostException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import android.content.Context;
+import android.app.IntentService;
+import android.content.Intent;
+import android.os.Handler;
 import android.widget.Toast;
 
-public class WifiLoginer {
-	public static void loginNamon(Context context, String netId, String pwd, Boolean lessToast) {
+public class WifiLoginer extends IntentService {
+	Handler mHandler;
+	public WifiLoginer() {
+		super("WifiLoginer");
+	}
+	
+	@Override
+	public void onCreate() {
+	    super.onCreate();
+	    mHandler = new Handler();
+	}; 
+	
+	private class DisplayToast implements Runnable {
+		int mRID;
+		String mText;
+
+		public DisplayToast(int RID) {
+			mRID = RID;
+		}
+		
+		public DisplayToast(String text) {
+			mText = text;
+		}
+
+		public void run() {
+			if (mText == null)
+				Toast.makeText(WifiLoginer.this, mRID, Toast.LENGTH_SHORT).show();
+			else
+				Toast.makeText(WifiLoginer.this, mText, Toast.LENGTH_SHORT).show();
+		}
+	}
+	
+	public void loginNamon(String netId, String pwd, Boolean lessToast) {
     	/* If lessToast is true, only show those message: 
     	 * 		login success, password incorrect and unknown error.
     	 * Use for auto login.
@@ -37,18 +70,18 @@ public class WifiLoginer {
 			
 		} catch (FileNotFoundException e) {
 			if (!lessToast)
-				Toast.makeText(context, R.string.err_already, Toast.LENGTH_SHORT).show();
+				mHandler.post(new DisplayToast(R.string.err_already)); 
 			return;
 		} catch (ConnectException e) {
 			if (!lessToast)
-				Toast.makeText(context, R.string.err_noNet, Toast.LENGTH_SHORT).show();
+				mHandler.post(new DisplayToast(R.string.err_noNet)); 
 			return;
 		} catch (UnknownHostException e) {
 			if (!lessToast)
-				Toast.makeText(context, R.string.err_noNet, Toast.LENGTH_SHORT).show();
+				mHandler.post(new DisplayToast(R.string.err_noNet)); 
 			return;
 		} catch (Exception e) {
-			Toast.makeText(context, R.string.err_unknow, Toast.LENGTH_SHORT).show();
+			mHandler.post(new DisplayToast(R.string.err_unknow)); 
 			e.printStackTrace();
 			return;
 		} finally {
@@ -69,7 +102,7 @@ public class WifiLoginer {
 	    	
 	    	URL url = new URL(loginUrl);
 	    	urlConn = (HttpURLConnection) url.openConnection();
-	    	urlConn.setConnectTimeout(2000);
+	    	urlConn.setConnectTimeout(3000);
 			InputStream in = new BufferedInputStream(urlConn.getInputStream());
 			byte[] data = new byte[10240];
 			int length = in.read(data);
@@ -77,10 +110,10 @@ public class WifiLoginer {
 			
     	} catch (MalformedURLException e) {
     		if (!lessToast)
-    			Toast.makeText(context, R.string.err_otherNet, Toast.LENGTH_SHORT).show();
+    			mHandler.post(new DisplayToast(R.string.err_otherNet)); 
     		return;
     	} catch (Exception e) {
-    		Toast.makeText(context, R.string.err_unknow, Toast.LENGTH_SHORT).show();
+			mHandler.post(new DisplayToast(R.string.err_unknow)); 
 			e.printStackTrace();
 			return;
 		} finally {
@@ -116,7 +149,7 @@ public class WifiLoginer {
 			resp = new String(data, 0, length);
     		
     	} catch (Exception e) {
-    		Toast.makeText(context, R.string.err_unknow, Toast.LENGTH_SHORT).show();
+			mHandler.post(new DisplayToast(R.string.err_unknow)); 
 			e.printStackTrace();
 			return;
 		} finally {
@@ -127,12 +160,21 @@ public class WifiLoginer {
     	Matcher m = Pattern.compile("(?:(?:25[0-5]|2[0-4]\\d|[01]?\\d?\\d)\\.){3}" +
     			"(?:25[0-5]|2[0-4]\\d|[01]?\\d?\\d)").matcher(resp);
     	if (!m.find())
-    		Toast.makeText(context, R.string.err_loginFail, Toast.LENGTH_SHORT).show();
+			mHandler.post(new DisplayToast(R.string.err_loginFail)); 
     	else {
-    		String msg = context.getString(R.string.login_ok);
+    		String msg = this.getString(R.string.login_ok);
     		msg = String.format(msg, m.group());
-    		Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+			mHandler.post(new DisplayToast(msg)); 
     	}
+	}
+
+	@Override
+	protected void onHandleIntent(Intent intent) {
+		String target = intent.getStringExtra("target");
+		String username = intent.getStringExtra("username");
+		String password = intent.getStringExtra("password");
+		Boolean lessToast = intent.getBooleanExtra("lessToast", false);
+		if (target.equals("Namon")) loginNamon(username, password, lessToast);
 	}
 	
 }
