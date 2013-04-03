@@ -47,7 +47,7 @@ public class NetworkBroadcast extends BroadcastReceiver {
     	login.putExtra("target", target);
     	login.putExtra("username", netId);
     	login.putExtra("password", pwd);
-    	login.putExtra("lessToast", false);
+    	login.putExtra("lessToast", true);
     	context.startService(login);
 	}
 
