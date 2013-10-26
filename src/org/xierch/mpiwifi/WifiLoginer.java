@@ -2,7 +2,6 @@ package org.xierch.mpiwifi;
 
 import java.io.BufferedInputStream;
 import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
@@ -60,18 +59,19 @@ public class WifiLoginer extends IntentService {
     	
     	// Get the URL of login page: 
     	try {
-			URL url = new URL("http://www.google.com/noexist");
+			URL url = new URL("http://client3.google.com/generate_204");
 			urlConn = (HttpURLConnection) url.openConnection();
 			urlConn.setConnectTimeout(2000);
+			
+			if (urlConn.getResponseCode() == HttpURLConnection.HTTP_NOT_AUTHORITATIVE) {
+				mHandler.post(new DisplayToast(R.string.err_already));
+				return;
+			}
 			InputStream in = new BufferedInputStream(urlConn.getInputStream());
 			byte[] data = new byte[1024];
 			int length = in.read(data);
 			resp = new String(data, 0, length);
-			
-		} catch (FileNotFoundException e) {
-			if (!lessToast)
-				mHandler.post(new DisplayToast(R.string.err_already)); 
-			return;
+	
 		} catch (ConnectException e) {
 			if (!lessToast)
 				mHandler.post(new DisplayToast(R.string.err_noNet)); 
