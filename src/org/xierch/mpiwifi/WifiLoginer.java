@@ -59,9 +59,12 @@ public class WifiLoginer extends IntentService {
     	
     	// Get the URL of login page: 
     	try {
+    		DNSResolver.lookup("client3.google.com", 1000);  
+    			// HttpURLConnection has not a custom timeout during NS lookup.
 			URL url = new URL("http://client3.google.com/generate_204");
 			urlConn = (HttpURLConnection) url.openConnection();
 			urlConn.setConnectTimeout(2000);
+			urlConn.setReadTimeout(2000);;
 			
 			if (urlConn.getResponseCode() == HttpURLConnection. HTTP_NO_CONTENT) {
 				if (!lessToast)
