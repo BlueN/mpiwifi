@@ -11,5 +11,6 @@
     <string name="login_pwd">密码: </string>
     <string name="menu_exit">关闭</string>
     <string name="login_autoLogin">连接热点时自动登录</string>
-
+	<string name="login_securityWarning">警告：由于南岸 Wi-Fi 登录页面未采用任何加密措施，您的账号密码可能在登录过程中泄漏。</string>
+    
 </resources>
