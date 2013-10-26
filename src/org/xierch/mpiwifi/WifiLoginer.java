@@ -63,7 +63,7 @@ public class WifiLoginer extends IntentService {
 			urlConn = (HttpURLConnection) url.openConnection();
 			urlConn.setConnectTimeout(2000);
 			
-			if (urlConn.getResponseCode() == HttpURLConnection.HTTP_NOT_AUTHORITATIVE) {
+			if (urlConn.getResponseCode() == HttpURLConnection. HTTP_NO_CONTENT) {
 				mHandler.post(new DisplayToast(R.string.err_already));
 				return;
 			}
