@@ -64,7 +64,8 @@ public class WifiLoginer extends IntentService {
 			urlConn.setConnectTimeout(2000);
 			
 			if (urlConn.getResponseCode() == HttpURLConnection. HTTP_NO_CONTENT) {
-				mHandler.post(new DisplayToast(R.string.err_already));
+				if (!lessToast)
+					mHandler.post(new DisplayToast(R.string.err_already));
 				return;
 			}
 			InputStream in = new BufferedInputStream(urlConn.getInputStream());
