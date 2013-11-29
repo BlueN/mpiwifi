@@ -26,6 +26,8 @@ public class NetworkBroadcast extends BroadcastReceiver {
 			return;
 		else if (ssid.equals("NamOn_Hostel"))
 			target = "Namon";
+		else if (ssid.equals("MengTakHostelWiFi"))
+			target = "Mengtak";
 		else
 			return;
 

@@ -182,6 +182,10 @@ public class WifiLoginer extends IntentService {
 		}
 	}
 
+	public void loginMengtak(String netId, String pwd, Boolean lessToast) {
+		loginNamon(netId, pwd, lessToast); // Seem to be same as Namon.
+	}
+
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		String target = intent.getStringExtra("target");
@@ -190,6 +194,8 @@ public class WifiLoginer extends IntentService {
 		Boolean lessToast = intent.getBooleanExtra("lessToast", false);
 		if (target.equals("Namon"))
 			loginNamon(username, password, lessToast);
+		else if (target.equals("Mengtak"))
+			loginMengtak(username, password, lessToast);
 	}
 
 }
