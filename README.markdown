@@ -5,7 +5,8 @@ MPI Wi-Fi is a useful tool on Android to help students connecting Wi-Fi on Macao
 ---
 
 ###Scope###
-* Nam Ngon Student Hostel (SSID: NamOn_Hostel).
+* Nam Ngon Student Hostel (SSID: NamOn_Hostel);
+* MingTak Hostel (SSID: MengTakHostelWiFi).
 
 Can be more in future.
 
