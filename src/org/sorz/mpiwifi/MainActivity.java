@@ -21,22 +21,13 @@ public class MainActivity extends Activity {
 	private SharedPreferences loginInfo;
 	private SharedPreferences settings;
 
-	private class LoginTask extends AsyncTask<Void, Void, Void> {
+	private class LoginTask extends AsyncTask<String, Void, String> {
 		private ProgressDialog dialog = null;
 		private Context context = null;
-		private String netId;
-		private String password;
 		private Exception exception;
-		private String ipAddress;
 
 		public LoginTask setContext(Context context) {
 			this.context = context;
-			return this;
-		}
-
-		public LoginTask setUserInfo(String netId, String password) {
-			this.netId = netId;
-			this.password = password;
 			return this;
 		}
 
@@ -51,9 +42,9 @@ public class MainActivity extends Activity {
 		}
 
 		@Override
-		protected Void doInBackground(Void... params) {
+		protected String doInBackground(String... params) {
 			try {
-				ipAddress = WifiLoginer.login(netId, password);
+				return WifiLoginer.login(params[0], params[1]);
 			} catch (Exception e) {
 				exception = e;
 			}
@@ -61,7 +52,7 @@ public class MainActivity extends Activity {
 		}
 
 		@Override
-		protected void onPostExecute(Void result) {
+		protected void onPostExecute(String ipAddress) {
 			dialog.dismiss();
 
 			if (ipAddress != null) {
@@ -84,6 +75,7 @@ public class MainActivity extends Activity {
 				Toast.makeText(context, R.string.err_unknow, Toast.LENGTH_SHORT)
 						.show();
 		}
+
 	}
 
 	@Override
@@ -163,6 +155,6 @@ public class MainActivity extends Activity {
 					.show();
 			return;
 		}
-		(new LoginTask()).setContext(this).setUserInfo(netId, pwd).execute();
+		(new LoginTask()).setContext(this).execute(netId, pwd);
 	}
 }
