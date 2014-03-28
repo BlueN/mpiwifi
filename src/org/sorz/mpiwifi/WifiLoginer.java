@@ -2,15 +2,20 @@ package org.sorz.mpiwifi;
 
 import java.io.BufferedInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.net.UnknownHostException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.sorz.mpiwifi.exceptions.AlreadyConnectedException;
+import org.sorz.mpiwifi.exceptions.LoginFailException;
+import org.sorz.mpiwifi.exceptions.NetworkException;
+import org.sorz.mpiwifi.exceptions.NoNetworkAccessException;
+import org.sorz.mpiwifi.exceptions.UnknownNetworkException;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -52,11 +57,9 @@ public class WifiLoginer extends IntentService {
 		}
 	}
 
-	public void loginNamon(String netId, String pwd, Boolean lessToast) {
-		/*
-		 * If lessToast is true, only show those message: login success,
-		 * password incorrect and unknown error. Use for auto login.
-		 */
+	public static String login(String netId, String pwd) throws NetworkException,
+			UnknownNetworkException, LoginFailException,
+			AlreadyConnectedException, NoNetworkAccessException {
 		HttpURLConnection urlConn = null;
 		String resp;
 
@@ -68,30 +71,19 @@ public class WifiLoginer extends IntentService {
 			urlConn = (HttpURLConnection) url.openConnection();
 			urlConn.setConnectTimeout(2000);
 			urlConn.setReadTimeout(2000);
-			;
 
-			if (urlConn.getResponseCode() == HttpURLConnection.HTTP_NO_CONTENT) {
-				if (!lessToast)
-					mHandler.post(new DisplayToast(R.string.err_already));
-				return;
-			}
+			if (urlConn.getResponseCode() == HttpURLConnection.HTTP_NO_CONTENT)
+				throw new AlreadyConnectedException();
+
 			InputStream in = new BufferedInputStream(urlConn.getInputStream());
 			byte[] data = new byte[1024];
 			int length = in.read(data);
 			resp = new String(data, 0, length);
 
-		} catch (ConnectException e) {
-			if (!lessToast)
-				mHandler.post(new DisplayToast(R.string.err_noNet));
-			return;
-		} catch (UnknownHostException e) {
-			if (!lessToast)
-				mHandler.post(new DisplayToast(R.string.err_noNet));
-			return;
-		} catch (Exception e) {
-			mHandler.post(new DisplayToast(R.string.err_unknow));
-			e.printStackTrace();
-			return;
+		} catch (MalformedURLException e) {
+			return ""; // Cannot occur
+		} catch (IOException e) {
+			throw new NoNetworkAccessException(e);
 		} finally {
 			if (urlConn != null)
 				urlConn.disconnect();
@@ -104,7 +96,7 @@ public class WifiLoginer extends IntentService {
 			Pattern p = Pattern.compile("'(http://.*)'");
 			Matcher m = p.matcher(resp);
 			if (!m.find())
-				throw new MalformedURLException();
+				throw new MalformedURLException("URL not found.");
 			loginUrl = m.group(1) + "&flag=location";
 			m = Pattern.compile(".*/").matcher(loginUrl);
 			m.find();
@@ -119,13 +111,9 @@ public class WifiLoginer extends IntentService {
 			resp = new String(data, 0, length);
 
 		} catch (MalformedURLException e) {
-			if (!lessToast)
-				mHandler.post(new DisplayToast(R.string.err_otherNet));
-			return;
-		} catch (Exception e) {
-			mHandler.post(new DisplayToast(R.string.err_unknow));
-			e.printStackTrace();
-			return;
+			throw new UnknownNetworkException(e);
+		} catch (IOException e) {
+			throw new NetworkException(e);
 		} finally {
 			if (urlConn != null)
 				urlConn.disconnect();
@@ -160,10 +148,8 @@ public class WifiLoginer extends IntentService {
 			int length = in.read(data);
 			resp = new String(data, 0, length);
 
-		} catch (Exception e) {
-			mHandler.post(new DisplayToast(R.string.err_unknow));
-			e.printStackTrace();
-			return;
+		} catch (IOException e) {
+			throw new NetworkException();
 		} finally {
 			if (urlConn != null)
 				urlConn.disconnect();
@@ -174,28 +160,36 @@ public class WifiLoginer extends IntentService {
 				"(?:(?:25[0-5]|2[0-4]\\d|[01]?\\d?\\d)\\.){3}"
 						+ "(?:25[0-5]|2[0-4]\\d|[01]?\\d?\\d)").matcher(resp);
 		if (!m.find())
-			mHandler.post(new DisplayToast(R.string.err_loginFail));
-		else {
-			String msg = this.getString(R.string.login_ok);
-			msg = String.format(msg, m.group());
-			mHandler.post(new DisplayToast(msg));
-		}
-	}
-
-	public void loginMengtak(String netId, String pwd, Boolean lessToast) {
-		loginNamon(netId, pwd, lessToast); // Seem to be same as Namon.
+			throw new LoginFailException(
+					"Can't found IP address on result page.");
+		return m.group();
 	}
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		String target = intent.getStringExtra("target");
 		String username = intent.getStringExtra("username");
 		String password = intent.getStringExtra("password");
-		Boolean lessToast = intent.getBooleanExtra("lessToast", false);
-		if (target.equals("Namon"))
-			loginNamon(username, password, lessToast);
-		else if (target.equals("Mengtak"))
-			loginMengtak(username, password, lessToast);
+
+		String ip = null;
+		try {
+			ip = login(username, password);
+		} catch (AlreadyConnectedException e) {
+			// Do nothing
+		} catch (NoNetworkAccessException e) {
+			// Ignore
+		} catch (UnknownNetworkException e) {
+			// Ignore
+		} catch (NetworkException e) {
+			// Ignore
+		} catch (LoginFailException e) {
+			mHandler.post(new DisplayToast(R.string.err_loginFail));
+		}
+		
+		if (ip != null) {
+			String msg = String.format(getString(R.string.login_ok), ip);
+			mHandler.post(new DisplayToast(msg));
+		}
+
 	}
 
 }
