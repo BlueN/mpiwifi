@@ -173,16 +173,10 @@ public class WifiLoginer extends IntentService {
 		String ip = null;
 		try {
 			ip = login(username, password);
-		} catch (AlreadyConnectedException e) {
-			// Do nothing
-		} catch (NoNetworkAccessException e) {
-			// Ignore
-		} catch (UnknownNetworkException e) {
-			// Ignore
-		} catch (NetworkException e) {
-			// Ignore
 		} catch (LoginFailException e) {
 			mHandler.post(new DisplayToast(R.string.err_loginFail));
+		} catch (Exception e) {
+			// Ignore
 		}
 		
 		if (ip != null) {
