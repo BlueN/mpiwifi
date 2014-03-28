@@ -20,15 +20,11 @@ public class NetworkBroadcast extends BroadcastReceiver {
 		WifiInfo wifiInfo = (WifiInfo) intent.getExtras().get(
 				WifiManager.EXTRA_WIFI_INFO);
 
-		String target;
 		String ssid = wifiInfo.getSSID();
 		if (ssid == null)
 			return;
-		else if (ssid.equals("NamOn_Hostel"))
-			target = "Namon";
-		else if (ssid.equals("MengTakHostelWiFi"))
-			target = "Mengtak";
-		else
+		else if (!(ssid.equals("NamOn_Hostel") ||
+				ssid.equals("MengTakHostelWiFi")))
 			return;
 
 		SharedPreferences settings = context.getSharedPreferences("settings",
@@ -49,10 +45,8 @@ public class NetworkBroadcast extends BroadcastReceiver {
 		}
 
 		Intent login = new Intent(context, WifiLoginer.class);
-		login.putExtra("target", target);
 		login.putExtra("username", netId);
 		login.putExtra("password", pwd);
-		login.putExtra("lessToast", true);
 		context.startService(login);
 	}
 
