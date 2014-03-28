@@ -36,7 +36,11 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:hint="p1234567"
-                android:inputType="text" />
+                android:inputType="text" >
+
+                <requestFocus />
+
+            </EditText>
         </TableRow>
 
         <TableRow
@@ -58,8 +62,6 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:inputType="textPassword" >
-
-                <requestFocus />
             </EditText>
         </TableRow>
 
