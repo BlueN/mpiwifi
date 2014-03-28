@@ -1,8 +1,16 @@
 package org.sorz.mpiwifi;
 
+import org.sorz.mpiwifi.exceptions.AlreadyConnectedException;
+import org.sorz.mpiwifi.exceptions.LoginFailException;
+import org.sorz.mpiwifi.exceptions.NetworkException;
+import org.sorz.mpiwifi.exceptions.NoNetworkAccessException;
+import org.sorz.mpiwifi.exceptions.UnknownNetworkException;
+
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
-import android.content.Intent;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,6 +20,71 @@ import android.widget.*;
 public class MainActivity extends Activity {
 	private SharedPreferences loginInfo;
 	private SharedPreferences settings;
+
+	private class LoginTask extends AsyncTask<Void, Void, Void> {
+		private ProgressDialog dialog = null;
+		private Context context = null;
+		private String netId;
+		private String password;
+		private Exception exception;
+		private String ipAddress;
+
+		public LoginTask setContext(Context context) {
+			this.context = context;
+			return this;
+		}
+
+		public LoginTask setUserInfo(String netId, String password) {
+			this.netId = netId;
+			this.password = password;
+			return this;
+		}
+
+		@Override
+		protected void onPreExecute() {
+			dialog = new ProgressDialog(context);
+			dialog.setTitle(R.string.logining_title);
+			dialog.setMessage(getString(R.string.logining_message));
+			dialog.setIndeterminate(true);
+			dialog.setCancelable(false);
+			dialog.show();
+		}
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			try {
+				ipAddress = WifiLoginer.login(netId, password);
+			} catch (Exception e) {
+				exception = e;
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			dialog.dismiss();
+
+			if (ipAddress != null) {
+				String msg = String.format(getString(R.string.login_ok),
+						ipAddress);
+				Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+			} else if (exception instanceof AlreadyConnectedException)
+				Toast.makeText(context, R.string.err_already,
+						Toast.LENGTH_SHORT).show();
+			else if (exception instanceof NoNetworkAccessException)
+				Toast.makeText(context, R.string.err_noNet, Toast.LENGTH_SHORT)
+						.show();
+			else if (exception instanceof UnknownNetworkException)
+				Toast.makeText(context, R.string.err_otherNet,
+						Toast.LENGTH_SHORT).show();
+			else if (exception instanceof LoginFailException)
+				Toast.makeText(context, R.string.err_loginFail,
+						Toast.LENGTH_SHORT).show();
+			else if (exception instanceof NetworkException)
+				Toast.makeText(context, R.string.err_unknow, Toast.LENGTH_SHORT)
+						.show();
+		}
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -90,12 +163,6 @@ public class MainActivity extends Activity {
 					.show();
 			return;
 		}
-
-		Intent login = new Intent(this, WifiLoginer.class);
-		login.putExtra("target", "Namon");
-		login.putExtra("username", netId);
-		login.putExtra("password", pwd);
-		login.putExtra("lessToast", false);
-		startService(login);
+		(new LoginTask()).setContext(this).setUserInfo(netId, pwd).execute();
 	}
 }

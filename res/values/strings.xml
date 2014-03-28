@@ -16,5 +16,6 @@
     <string name="menu_exit">Exit</string>
     <string name="login_autoLogin">Auto login after connected.</string>
     <string name="login_securityWarning">Warning: Since the web login page on Namon Hostel don`t take any encryption such TLS, your Net-ID and password may be leaked when you login.</string>
-    
+    <string name="logining_title">Logining</string>
+    <string name="logining_message">Please wait a moment.</string>
 </resources>
