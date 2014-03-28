@@ -1,4 +1,4 @@
-package org.xierch.mpiwifi;
+package org.sorz.mpiwifi;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
