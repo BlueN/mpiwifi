@@ -23,7 +23,7 @@ The program can make it easier.
 ---
 
 ###How to use###
-1. Download the APK file and install it on your Android phone;
+1. [Download](https://github.com/BlueN/mpiwifi/releases/ "Download") the APK file and install it on your Android phone;
 2. Run *MPI Wi-Fi*, enter your *Net ID* and *Password*;
 3. Check the *Auto login* box;
 4. Close the application.
