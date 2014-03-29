@@ -20,5 +20,5 @@ local.properties
 *.*~
 *~
 
-# Private constants
-src/org/mariotaku/twidere/PrivateConstants.java
+# Eclpise
+.settings/
