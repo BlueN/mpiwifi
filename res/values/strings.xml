@@ -13,7 +13,7 @@
     <string name="err_otherNet">Unknown network. Please confirm it is the WiFi of MPI NamOn hostel.</string>
     <string name="err_loginFail">Login fail. Please check your Net ID and password.</string>
     <string name="login_ok">Login successful. Your IP is %s .</string>
-    <string name="menu_exit">Exit</string>
+    <string name="menu_exit">Save &amp; Close</string>
     <string name="login_autoLogin">Auto login after connected.</string>
     <string name="login_securityWarning">Warning: Since the web login page on Namon Hostel don`t take any encryption such TLS, your Net-ID and password may be leaked when you login.</string>
     <string name="logining_title">Logining</string>

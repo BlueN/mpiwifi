@@ -9,7 +9,7 @@
     <string name="login_login">登录</string>
     <string name="login_ok">登录成功！您的 IP 为 %s。</string>
     <string name="login_pwd">密码: </string>
-    <string name="menu_exit">关闭</string>
+    <string name="menu_exit">保存并关闭</string>
     <string name="login_autoLogin">连接热点时自动登录</string>
 	<string name="login_securityWarning">警告：由于南岸 Wi-Fi 登录页面未采用任何加密措施，您的账号密码可能在登录过程中泄漏。</string>
     <string name="logining_title">登录中</string>

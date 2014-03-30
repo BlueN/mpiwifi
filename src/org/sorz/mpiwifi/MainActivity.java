@@ -12,6 +12,8 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +22,10 @@ import android.widget.*;
 public class MainActivity extends Activity {
 	private SharedPreferences loginInfo;
 	private SharedPreferences settings;
+	
+	private EditText netIdEdit;
+	private EditText passwordEdit;
+	private CheckBox autoLogin;
 
 	private class LoginTask extends AsyncTask<String, Void, String> {
 		private ProgressDialog dialog = null;
@@ -86,15 +92,35 @@ public class MainActivity extends Activity {
 		loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
 		settings = getSharedPreferences("settings", MODE_PRIVATE);
 
-		EditText netId = (EditText) findViewById(R.id.netId);
-		EditText pwd = (EditText) findViewById(R.id.pwd);
-		CheckBox auto = (CheckBox) findViewById(R.id.autoLogin);
+		netIdEdit = (EditText) findViewById(R.id.netId);
+		passwordEdit = (EditText) findViewById(R.id.pwd);
+		autoLogin = (CheckBox) findViewById(R.id.autoLogin);
 
-		netId.setText(loginInfo.getString("netId", ""));
-		pwd.setText(loginInfo.getString("pwd", ""));
-		auto.setChecked(settings.getBoolean("autoLogin", false));
+		netIdEdit.setText(loginInfo.getString("netId", ""));
+		passwordEdit.setText(loginInfo.getString("pwd", ""));
+		autoLogin.setChecked(settings.getBoolean("autoLogin", false));
+		
+		TextWatcher loginInfoChangedWatcher = new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {}
+			@Override
+			public void afterTextChanged(Editable s) {
+				if (s.length() == 0)
+					autoLogin.setChecked(false);
+			}
+		};
+		netIdEdit.addTextChangedListener(loginInfoChangedWatcher);
+		passwordEdit.addTextChangedListener(loginInfoChangedWatcher);
 	}
 
+	@Override
+	protected void onPause() {
+		super.onPause();
+		saveSettings();
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -111,50 +137,39 @@ public class MainActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	
+	private void saveSettings() {
+		SharedPreferences.Editor editor = loginInfo.edit();
+		String netId = netIdEdit.getText().toString();
+		String password = passwordEdit.getText().toString();
+		
+		editor.putString("netId", netId);
+		editor.putString("pwd", password);
+		editor.commit();
+		
+		editor = settings.edit();
+		editor.putBoolean("autoLogin", autoLogin.isChecked());
+		editor.commit();
+	}
+	
 
 	public void setAutoLogin(View v) {
-		CheckBox auto = (CheckBox) v;
-		EditText netIdR = (EditText) findViewById(R.id.netId);
-		EditText pwdR = (EditText) findViewById(R.id.pwd);
-		String netId = netIdR.getText().toString();
-		String pwd = pwdR.getText().toString();
-
-		if (auto.isChecked())
-			if (netId.isEmpty() || pwd.isEmpty()) {
-				auto.setChecked(false);
+		if (autoLogin.isChecked())
+			if (netIdEdit.length() == 0 || passwordEdit.length() == 0) {
+				autoLogin.setChecked(false);
 				Toast.makeText(this, R.string.err_noEnter, Toast.LENGTH_SHORT)
 						.show();
 			}
-
-		SharedPreferences.Editor editor = settings.edit();
-		editor.putBoolean("autoLogin", auto.isChecked());
-		editor.commit();
-
-		editor = loginInfo.edit();
-		editor.putString("netId", netId);
-		editor.putString("pwd", pwd);
-		editor.commit();
 	}
 
 	public void login(View v) {
-		EditText netIdR = (EditText) findViewById(R.id.netId);
-		EditText pwdR = (EditText) findViewById(R.id.pwd);
-		CheckBox autoR = (CheckBox) findViewById(R.id.autoLogin);
-		String netId = netIdR.getText().toString();
-		String pwd = pwdR.getText().toString();
+		String netId = netIdEdit.getText().toString();
+		String pwd = passwordEdit.getText().toString();
 
-		// Save login information:
-		SharedPreferences.Editor editor = loginInfo.edit();
-		editor.putString("netId", netId);
-		editor.putString("pwd", pwd);
-		editor.commit();
-
-		if (netId.isEmpty() || pwd.isEmpty()) {
-			autoR.setChecked(false);
+		if (netId.isEmpty() || pwd.isEmpty())
 			Toast.makeText(this, R.string.err_noEnter, Toast.LENGTH_SHORT)
 					.show();
-			return;
-		}
-		(new LoginTask()).setContext(this).execute(netId, pwd);
+		else
+			(new LoginTask()).setContext(this).execute(netId, pwd);
 	}
 }
