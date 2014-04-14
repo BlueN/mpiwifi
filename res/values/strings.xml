@@ -2,7 +2,6 @@
 <resources>
 
     <string name="app_name">MPI Wi-Fi</string>
-    <string name="action_settings">Settings</string>
     <string name="login_netid">Net ID: </string>
     <string name="login_pwd">Password: </string>
     <string name="login_login">Login</string>
