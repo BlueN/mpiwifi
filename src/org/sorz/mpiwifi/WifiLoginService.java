@@ -9,6 +9,10 @@ import android.widget.Toast;
 
 public class WifiLoginService extends IntentService {
 	Handler mHandler;
+	
+	public WifiLoginService() {
+		this("WifiLoginService");
+	}
 
 	public WifiLoginService(String name) {
 		super(name);

@@ -33,7 +33,7 @@
 	            <action android:name="android.net.wifi.STATE_CHANGE" />
 	        </intent-filter>
     	</receiver>
-    	<service android:name=".WifiLoginer" />
+    	<service android:name=".WifiLoginService" />
     </application>
 
 </manifest>
