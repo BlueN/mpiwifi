@@ -22,9 +22,8 @@ import android.view.View;
 import android.widget.*;
 
 public class MainActivity extends Activity {
-	private SharedPreferences loginInfo;
 	private SharedPreferences settings;
-	
+
 	private EditText netIdEdit;
 	private EditText passwordEdit;
 	private CheckBox autoLogin;
@@ -91,15 +90,14 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
 		settings = getSharedPreferences("settings", MODE_PRIVATE);
 
 		netIdEdit = (EditText) findViewById(R.id.netId);
 		passwordEdit = (EditText) findViewById(R.id.pwd);
 		autoLogin = (CheckBox) findViewById(R.id.autoLogin);
 
-		netIdEdit.setText(loginInfo.getString("netId", ""));
-		passwordEdit.setText(loginInfo.getString("pwd", ""));
+		netIdEdit.setText(settings.getString("netId", ""));
+		passwordEdit.setText(settings.getString("pwd", ""));
 		autoLogin.setChecked(settings.getBoolean("autoLogin", false));
 		
 		TextWatcher loginInfoChangedWatcher = new TextWatcher() {
@@ -154,10 +152,7 @@ public class MainActivity extends Activity {
 							netIdEdit.getText().clear();
 							passwordEdit.getText().clear();
 							autoLogin.setSelected(false);
-							SharedPreferences.Editor editor = loginInfo.edit();
-							editor.clear();
-							editor.apply();
-							editor = settings.edit();
+							SharedPreferences.Editor editor = settings.edit();
 							editor.clear();
 							editor.apply();
 						}
@@ -166,15 +161,12 @@ public class MainActivity extends Activity {
 	}
 	
 	private void saveSettings() {
-		SharedPreferences.Editor editor = loginInfo.edit();
+		SharedPreferences.Editor editor = settings.edit();;
 		String netId = netIdEdit.getText().toString();
 		String password = passwordEdit.getText().toString();
 		
 		editor.putString("netId", netId);
 		editor.putString("pwd", password);
-		editor.commit();
-		
-		editor = settings.edit();
 		editor.putBoolean("autoLogin", autoLogin.isChecked());
 		editor.commit();
 	}
