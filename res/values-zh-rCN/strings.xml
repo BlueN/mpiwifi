@@ -10,8 +10,12 @@
     <string name="login_ok">登录成功！您的 IP 为 %s。</string>
     <string name="login_pwd">密码: </string>
     <string name="menu_exit">保存并关闭</string>
+    <string name="menu_clean">清空设置</string>
     <string name="login_autoLogin">连接热点时自动登录</string>
 	<string name="login_securityWarning">警告：由于南岸 Wi-Fi 登录页面未采用任何加密措施，您的账号密码可能在登录过程中泄漏。</string>
     <string name="logining_title">登录中</string>
     <string name="logining_message">正在为您登录，请稍候。</string>
+    <string name="clean_title">清空设置</string>
+    <string name="clean_message">您的 Net ID 及密码将会被清除，自动登录功能将关闭。</string>
+    <string name="clean_ok">确认清除</string>
 </resources>

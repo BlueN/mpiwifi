@@ -14,8 +14,12 @@
     <string name="err_loginFail">Login fail. Please check your Net ID and password.</string>
     <string name="login_ok">Login successful. Your IP is %s .</string>
     <string name="menu_exit">Save &amp; Close</string>
+    <string name="menu_clean">Forget All</string>
     <string name="login_autoLogin">Auto login after connected.</string>
     <string name="login_securityWarning">Warning: Since the web login page on Namon Hostel don`t take any encryption such TLS, your Net-ID and password may be leaked when you login.</string>
     <string name="logining_title">Logining</string>
     <string name="logining_message">Please wait a moment.</string>
+    <string name="clean_title">Forget All</string>
+    <string name="clean_message">Are you sure clean all data including your Net ID and password?</string>
+    <string name="clean_ok">Yes</string>
 </resources>

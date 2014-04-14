@@ -9,8 +9,10 @@ import org.sorz.mpiwifi.exceptions.UnknownNetworkException;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -134,8 +136,33 @@ public class MainActivity extends Activity {
 		case R.id.menu_exit:
 			finish();
 			break;
+		case R.id.menu_clean:
+			clean();
+			break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	private void clean() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.clean_title)
+			.setMessage(R.string.clean_message)
+			.setNeutralButton(R.string.clean_ok,
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							netIdEdit.getText().clear();
+							passwordEdit.getText().clear();
+							autoLogin.setSelected(false);
+							SharedPreferences.Editor editor = loginInfo.edit();
+							editor.clear();
+							editor.apply();
+							editor = settings.edit();
+							editor.clear();
+							editor.apply();
+						}
+					}).show();
+		
 	}
 	
 	private void saveSettings() {

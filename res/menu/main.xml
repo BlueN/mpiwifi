@@ -4,5 +4,9 @@
         android:id="@+id/menu_exit"
         android:orderInCategory="100"
         android:title="@string/menu_exit"/>
+    <item
+        android:id="@+id/menu_clean"
+        android:orderInCategory="200"
+        android:title="@string/menu_clean"/>
 
 </menu>
