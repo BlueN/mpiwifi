@@ -1,9 +1,12 @@
 package org.sorz.mpiwifi;
 
-import java.io.BufferedInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,173 +20,151 @@ import org.sorz.mpiwifi.exceptions.NetworkException;
 import org.sorz.mpiwifi.exceptions.NoNetworkAccessException;
 import org.sorz.mpiwifi.exceptions.UnknownNetworkException;
 
-import android.app.IntentService;
-import android.content.Intent;
-import android.os.Handler;
-import android.widget.Toast;
+public class WifiLoginer {
+	private final static int TIMEOUT = 2000;
+	private final static String REGEXP_ARGS = "id=\"(\\w+?)\" value='(\\w*?)'";
+	private final static String REGEXP_IPADDRESS = "(?:(?:25[0-5]|2[0-4]\\d|[01]?\\d?\\d)\\.){3}(?:25[0-5]|2[0-4]\\d|[01]?\\d?\\d)";
+	private final static String FIX_ARGS = "username=%s&usernameHidden=%s&pwd=%s&seczone&validcode=no_check";
 
-public class WifiLoginer extends IntentService {
-	Handler mHandler;
 
-	public WifiLoginer() {
-		super("WifiLoginer");
+	private static String readPage(InputStream inputStream, int bufferSize)
+			throws IOException {
+		Reader reader = new InputStreamReader(inputStream);
+		char[] buffer = new char[bufferSize];
+		int length = reader.read(buffer);
+		return new String(buffer, 0, length);
 	}
 
-	@Override
-	public void onCreate() {
-		super.onCreate();
-		mHandler = new Handler();
-	};
-
-	private class DisplayToast implements Runnable {
-		int mRID;
-		String mText;
-
-		public DisplayToast(int RID) {
-			mRID = RID;
-		}
-
-		public DisplayToast(String text) {
-			mText = text;
-		}
-
-		public void run() {
-			if (mText == null)
-				Toast.makeText(WifiLoginer.this, mRID, Toast.LENGTH_SHORT)
-						.show();
-			else
-				Toast.makeText(WifiLoginer.this, mText, Toast.LENGTH_SHORT)
-						.show();
-		}
-	}
-
-	public static String login(String netId, String pwd) throws NetworkException,
-			UnknownNetworkException, LoginFailException,
-			AlreadyConnectedException, NoNetworkAccessException {
-		HttpURLConnection urlConn = null;
-		String resp;
-
-		// Get the URL of login page:
+	private static String getRedirectPage() throws AlreadyConnectedException,
+			NoNetworkAccessException {
+		HttpURLConnection conn = null;
 		try {
-			DNSResolver.lookup("client3.google.com", 1000);
+			DNSResolver.lookup("client3.google.com", TIMEOUT);
 			// HttpURLConnection has not a custom timeout during NS lookup.
 			URL url = new URL("http://client3.google.com/generate_204");
-			urlConn = (HttpURLConnection) url.openConnection();
-			urlConn.setConnectTimeout(2000);
-			urlConn.setReadTimeout(2000);
+			conn = (HttpURLConnection) url.openConnection();
+			conn.setConnectTimeout(TIMEOUT);
+			conn.setReadTimeout(TIMEOUT);
 
-			if (urlConn.getResponseCode() == HttpURLConnection.HTTP_NO_CONTENT)
+			if (conn.getResponseCode() == HttpURLConnection.HTTP_NO_CONTENT)
 				throw new AlreadyConnectedException();
 
-			InputStream in = new BufferedInputStream(urlConn.getInputStream());
-			byte[] data = new byte[1024];
-			int length = in.read(data);
-			resp = new String(data, 0, length);
+			return readPage(conn.getInputStream(), 1024);
 
 		} catch (MalformedURLException e) {
 			return ""; // Cannot occur
 		} catch (IOException e) {
 			throw new NoNetworkAccessException(e);
 		} finally {
-			if (urlConn != null)
-				urlConn.disconnect();
+			if (conn != null)
+				conn.disconnect();
 		}
+	}
 
-		// Get the login page:
-		String postUrl;
-		String loginUrl;
+	private static URL parseUrlFromRedirectPage(String page)
+			throws UnknownNetworkException {
+		Matcher matcher = Pattern.compile("'(http://.*)'").matcher(page);
+		if (!matcher.find())
+			throw new UnknownNetworkException(
+					"URL not found on the redirect page.");
 		try {
-			Pattern p = Pattern.compile("'(http://.*)'");
-			Matcher m = p.matcher(resp);
-			if (!m.find())
-				throw new MalformedURLException("URL not found.");
-			loginUrl = m.group(1) + "&flag=location";
-			m = Pattern.compile(".*/").matcher(loginUrl);
-			m.find();
-			postUrl = m.group() + "user.do?method=login_ajax";
-
-			URL url = new URL(loginUrl);
-			urlConn = (HttpURLConnection) url.openConnection();
-			urlConn.setConnectTimeout(3000);
-			InputStream in = new BufferedInputStream(urlConn.getInputStream());
-			byte[] data = new byte[10240];
-			int length = in.read(data);
-			resp = new String(data, 0, length);
-
+			URL url = new URL(matcher.group(1) + "&flag=location");
+			return url;
 		} catch (MalformedURLException e) {
-			throw new UnknownNetworkException(e);
+			throw new UnknownNetworkException(
+					"Malformed URL on the redirect page.");
+		}
+	}
+
+	private static String getLoginPage(URL loginUrl) throws NetworkException {
+		HttpURLConnection conn = null;
+		try {
+			conn = (HttpURLConnection) loginUrl.openConnection();
+			conn.setConnectTimeout(TIMEOUT);
+			conn.setReadTimeout(TIMEOUT * 2);
+
+			return readPage(conn.getInputStream(), 10240);
+
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		} finally {
-			if (urlConn != null)
-				urlConn.disconnect();
+			if (conn != null)
+				conn.disconnect();
 		}
+	}
 
-		// Post login form:
+	private static String parseLoginArgs(String loginPage) {
+		Matcher matcher = Pattern.compile(REGEXP_ARGS).matcher(loginPage);
+		String args = "";
+		while (matcher.find())
+			args += String.format("%s=%s&", matcher.group(1), matcher.group(2));
+		return args;
+	}
+
+	private static String postLoginPage(URL postUrl, String args)
+			throws NetworkException {
+		HttpURLConnection conn = null;
 		try {
-			URL url = new URL(postUrl);
-			urlConn = (HttpURLConnection) url.openConnection();
-			urlConn.setDoOutput(true);
-			urlConn.setRequestMethod("POST");
-			urlConn.setInstanceFollowRedirects(true);
-			urlConn.connect();
-			DataOutputStream out = new DataOutputStream(
-					urlConn.getOutputStream());
+			conn = (HttpURLConnection) postUrl.openConnection();
+			conn.setConnectTimeout(TIMEOUT);
+			conn.setReadTimeout(TIMEOUT * 2);
+			conn.setDoOutput(true);
+			conn.setRequestMethod("POST");
+			conn.setInstanceFollowRedirects(true);
+			conn.connect();
+			Writer writer = new OutputStreamWriter(conn.getOutputStream());
+			writer.write(args);
+			writer.flush();
+			writer.close();
 
-			String args = "usernmae=" + URLEncoder.encode(netId, "utf-8")
-					+ "&usernameHidden=" + URLEncoder.encode(netId, "utf-8")
-					+ "&pwd=" + URLEncoder.encode(pwd, "utf-8")
-					+ "&seczone&validcode=no_check";
-			Matcher m = Pattern.compile("id=\"(\\w+?)\" value='(\\w*?)'")
-					.matcher(resp);
-			while (m.find()) {
-				args = args + "&" + m.group(1) + "=" + m.group(2);
-			}
-
-			out.writeBytes(args);
-			out.flush();
-			out.close();
-			InputStream in = new BufferedInputStream(urlConn.getInputStream());
-			byte[] data = new byte[10240];
-			int length = in.read(data);
-			resp = new String(data, 0, length);
-
+			return readPage(conn.getInputStream(), 10240);
 		} catch (IOException e) {
 			throw new NetworkException();
 		} finally {
-			if (urlConn != null)
-				urlConn.disconnect();
+			if (conn != null)
+				conn.disconnect();
 		}
-
-		// Check result:
-		Matcher m = Pattern.compile(
-				"(?:(?:25[0-5]|2[0-4]\\d|[01]?\\d?\\d)\\.){3}"
-						+ "(?:25[0-5]|2[0-4]\\d|[01]?\\d?\\d)").matcher(resp);
-		if (!m.find())
-			throw new LoginFailException(
-					"Can't found IP address on result page.");
-		return m.group();
 	}
 
-	@Override
-	protected void onHandleIntent(Intent intent) {
-		String username = intent.getStringExtra("username");
-		String password = intent.getStringExtra("password");
+	public static String login(String netId, String pwd)
+			throws NetworkException, UnknownNetworkException,
+			LoginFailException, AlreadyConnectedException,
+			NoNetworkAccessException {
 
-		String ip = null;
+		// Read redirect page, get login page URL and post URL:
+		String redirectPage = getRedirectPage();
+		URL loginPageUrl = parseUrlFromRedirectPage(redirectPage);
+		URL postUrl;
 		try {
-			ip = login(username, password);
-		} catch (LoginFailException e) {
-			mHandler.post(new DisplayToast(R.string.err_loginFail));
-		} catch (Exception e) {
-			// Ignore
-		}
-		
-		if (ip != null) {
-			String msg = String.format(getString(R.string.login_ok), ip);
-			mHandler.post(new DisplayToast(msg));
+			postUrl = new URL(loginPageUrl, "user.do?method=login_ajax");
+		} catch (MalformedURLException e) {
+			throw new UnknownNetworkException(e);
 		}
 
+		// Read login page, get POST arguments:
+		String loginPage = getLoginPage(loginPageUrl);
+		String args = parseLoginArgs(loginPage);
+
+		String netIdEncoded;
+		String pwdEncoded;
+		try {
+			netIdEncoded = URLEncoder.encode(netId, "utf-8");
+			pwdEncoded = URLEncoder.encode(pwd, "utf-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new LoginFailException("Net-ID or password encoding error.",
+					e);
+		}
+		args += String.format(FIX_ARGS, netIdEncoded, netIdEncoded, pwdEncoded);
+
+		// Send the POST:
+		String resultPage = postLoginPage(postUrl, args);
+
+		// Check (find IP address):
+		Matcher matcher = Pattern.compile(REGEXP_IPADDRESS).matcher(resultPage);
+		if (!matcher.find())
+			throw new LoginFailException(
+					"Can't found IP address on result page.");
+		return matcher.group();
 	}
 
 }

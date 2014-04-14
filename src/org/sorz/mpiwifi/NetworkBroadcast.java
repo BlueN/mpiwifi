@@ -44,7 +44,7 @@ public class NetworkBroadcast extends BroadcastReceiver {
 			return;
 		}
 
-		Intent login = new Intent(context, WifiLoginer.class);
+		Intent login = new Intent(context, WifiLoginService.class);
 		login.putExtra("username", netId);
 		login.putExtra("password", pwd);
 		context.startService(login);
