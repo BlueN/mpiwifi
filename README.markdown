@@ -2,6 +2,8 @@
 
 MPI Wi-Fi is a useful tool on Android to help students connecting Wi-Fi on Macao Polytechnic Institue.
 
+[![Get it on Google Play](https://developer.android.com/images/brand/en_generic_rgb_wo_45.png)](https://play.google.com/store/apps/details?id=org.sorz.mpiwifi)
+
 ---
 
 ###Scope###
