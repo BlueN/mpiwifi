@@ -174,21 +174,24 @@ public class MainActivity extends Activity {
 
 	public void setAutoLogin(View v) {
 		if (autoLogin.isChecked())
-			if (netIdEdit.length() == 0 || passwordEdit.length() == 0) {
+			if (passwordEdit.length() == 0) {
+				passwordEdit.setError(getText(R.string.err_password_required));
 				autoLogin.setChecked(false);
-				Toast.makeText(this, R.string.err_noEnter, Toast.LENGTH_SHORT)
-						.show();
+			}
+			if (netIdEdit.length() == 0) {
+				netIdEdit.setError(getText(R.string.err_netid_required));
+				autoLogin.setChecked(false);
 			}
 	}
 
 	public void login(View v) {
 		String netId = netIdEdit.getText().toString();
 		String pwd = passwordEdit.getText().toString();
-
-		if (netId.isEmpty() || pwd.isEmpty())
-			Toast.makeText(this, R.string.err_noEnter, Toast.LENGTH_SHORT)
-					.show();
-		else
+		if (netId.isEmpty())
+			netIdEdit.setError(getText(R.string.err_netid_required));
+		if (pwd.isEmpty())
+			passwordEdit.setError(getText(R.string.err_password_required));
+		if (! (netId.isEmpty() || pwd.isEmpty()))
 			(new LoginTask()).setContext(this).execute(netId, pwd);
 	}
 }

@@ -5,7 +5,8 @@
     <string name="login_netid">Net ID: </string>
     <string name="login_pwd">Password: </string>
     <string name="login_login">Login</string>
-    <string name="err_noEnter">Please enter Net ID and Password.</string>
+    <string name="err_netid_required">Please enter your Net ID.</string>
+    <string name="err_password_required">Please enter your password.</string>
     <string name="err_noNet">No network connect.</string>
     <string name="err_already">You already can access Internet.</string>
     <string name="err_unknow">Sorry, an unknown error occurred.</string>

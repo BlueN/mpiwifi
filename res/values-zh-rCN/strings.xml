@@ -3,7 +3,8 @@
     <string name="login_netid">Net ID: </string>
     <string name="err_already">您已连接互联网，无需登录。</string>
     <string name="err_loginFail">登录失败，请检查 Net ID 及密码。</string>
-    <string name="err_noEnter">请先输入您的 Net ID 及密码。</string>
+    <string name="err_netid_required">请输入您的 Net ID</string>
+    <string name="err_password_required">请输入您的密码</string>
     <string name="err_noNet">无网络</string>
     <string name="err_otherNet">未知网络，请确认您连接的是南岸宿舍 Wi-Fi。</string>
     <string name="err_unknow">抱歉，发生未知错误。</string>
